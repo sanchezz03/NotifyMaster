@@ -32,7 +32,7 @@ To expose your local server to the internet, you need to use ngrok.
 ### Step 5: Update the Webhook URL in Telegram
 After setting up ngrok, you need to update the webhook URL for the Telegram bot.
 
-## Step 2: Modify the Webhook URL
+## 2. Modify the Webhook URL
 - In the terminal, you should have the **forwarding URL** from ngrok (e.g., `https://2ae1-146-120-162-35.ngrok-free.app`).
 - Replace `{forwarding_url}` in the following link with the ngrok URL you copied:
 
