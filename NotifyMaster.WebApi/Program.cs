@@ -15,7 +15,8 @@ builder.Services.AddSingleton<IUpdateHandler, UpdateHandler>();
 builder.Services.ConfigureTelegramBotMvc();
 
 builder.Services.AddControllers();
-builder.Services.AddHangfire(cfg => cfg.UseSqlServerStorage("Server=SANCHEZ\\SQLEXPRESS;Database=HangfireDb;User Id=sa;Password=68joker13;Encrypt=True;TrustServerCertificate=True;"));
+builder.Services.AddHangfire(cfg => 
+    cfg.UseSqlServerStorage("Server=SANCHEZ\\SQLEXPRESS;Database=HangfireDb;User Id=sa;Password=68joker13;Encrypt=True;TrustServerCertificate=True;"));
 builder.Services.AddHangfireServer();
 
 builder.Services.AddTransient<IReminderService, ReminderService>();
