@@ -1,28 +1,30 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
+using NotifyMaster.Application.Handlers.Interfaces;
 using NotifyMaster.Application.Services.Interfaces;
+using System.Collections.Concurrent;
 using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace NotifyMaster.Application.Services;
 
 public class ReminderService : IReminderService
 {
-    private readonly Dictionary<long, List<string>> _userReminders;
+    private readonly ConcurrentDictionary<long, List<string>> _userReminders;
+    private readonly ISendMessageHandler _sendMessageHandler;
     private readonly ITelegramBotClient _botClient;
     private readonly ILogger<ReminderService> _logger;
 
-    public ReminderService(ITelegramBotClient botClient, ILogger<ReminderService> logger)
+    public ReminderService(ISendMessageHandler sendMessageHandler, ITelegramBotClient botClient, ILogger<ReminderService> logger)
     {
+        _sendMessageHandler = sendMessageHandler;
         _userReminders = new();
         _botClient = botClient;
         _logger = logger;
     }
 
-    public void ScheduleReminder(long chatId, long userId, string message, string callbackData, TimeSpan delay)
+    public void ScheduleReminder(long chatId, long userId, string message, string callbackData, string button, TimeSpan delay)
     {
-        var jobId = BackgroundJob.Schedule(() => SendReminderMessage(chatId, message, callbackData), delay);
+        var jobId = BackgroundJob.Schedule(() => SendReminderMessage(chatId, message, callbackData, button), delay);
 
         if (!_userReminders.ContainsKey(userId))
         {
@@ -34,30 +36,20 @@ public class ReminderService : IReminderService
 
     public void CancelReminders(long userId)
     {
-        if (_userReminders.TryGetValue(userId, out var jobIds))
+        if (_userReminders.TryRemove(userId, out var jobIds))
         {
             foreach (var jobId in jobIds)
             {
                 BackgroundJob.Delete(jobId);
             }
-            _userReminders.Remove(userId);
         }
     }
 
-    public async Task SendReminderMessage(long chatId, string message, string callbackData)
+    public async Task SendReminderMessage(long chatId, string message, string callbackData, string button)
     {
         try
         {
-            var joinClubButton = new InlineKeyboardMarkup(
-                InlineKeyboardButton.WithCallbackData("Вструпить в групу", callbackData)
-            );
-
-            await _botClient.SendTextMessageAsync(
-               chatId: chatId,
-               text: message,
-               parseMode: ParseMode.Markdown,
-               replyMarkup: joinClubButton
-           );
+            await _sendMessageHandler.SendMessage(_botClient, chatId, message, callbackData, button);
         }
         catch (Exception ex)
         {

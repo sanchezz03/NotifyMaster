@@ -8,7 +8,7 @@ public class BotConfigurationOption : IConfigureOptions<BotConfiguration>
 {
     private readonly IConfigurationSection _configurationSection;
 
-    public BotConfigurationOption(IConfigurationSection configuration)
+    public BotConfigurationOption(IConfiguration configuration)
     {
         _configurationSection = configuration.GetSection(Constants.CONFIGURATION_SECTION_TOKEN);
     }

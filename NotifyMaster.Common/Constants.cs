@@ -6,4 +6,5 @@ public static class Constants
     /// List Configuration Section Names in Configure file
     /// </summary>
     public const string CONFIGURATION_SECTION_TOKEN = "TelegramBot";
+    public const string CONFIGURATION_SECTION_HANFIRE = "Hangfire";
 }
