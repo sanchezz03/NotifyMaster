@@ -1,19 +1,11 @@
-using NotifyMaster.Application.Extensions;
 using NotifyMaster.Common.Extensions;
-using NotifyMaster.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host
     .AddConfiguration();
 
-builder.Services
-    .AddTelegramBotClient()
-    .ConfigureTelegramBotMvc()
-    .AddControllers().Services
-    .AddHandlers()
-    .AddServices()
-    .AddHangfire();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
