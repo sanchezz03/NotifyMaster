@@ -9,6 +9,7 @@ public static class ApplicationServiceExtension
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         return services
-            .AddSingleton<IReminderService, ReminderService>();
+            .AddScoped<IUserService, UserService>()
+            .AddScoped<IReminderService, ReminderService>();
     }
 }

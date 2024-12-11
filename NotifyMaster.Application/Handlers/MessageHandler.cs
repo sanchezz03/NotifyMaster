@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using NotifyMaster.Application.Handlers.Interfaces;
 using NotifyMaster.Application.Services.Interfaces;
-using System.Collections.Concurrent;
+using NotifyMaster.Common.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using BotCommand = NotifyMaster.Common.Enums.BotCommand;
 
 namespace NotifyMaster.Application.Handlers;
 
@@ -11,23 +12,19 @@ public class MessageHandler : IMessageHandler
 {
     private readonly ISendMessageHandler _sendMessageHandler;
     private readonly IReminderService _reminderService;
+    private readonly IUserService _userService;
     private readonly ILogger<MessageHandler> _logger;
-    private readonly ConcurrentDictionary<int, string> _reminderSchedule;
 
     private const string JOIN_CLUB_CALLBACK = "join_club";
     private const string JOIN_CLUB_BUTTON = "Вступить в группу";
 
-    public MessageHandler(ISendMessageHandler sendMessageHandler, IReminderService reminderService, ILogger<MessageHandler> logger)
+    public MessageHandler(ISendMessageHandler sendMessageHandler, IUserService userService,
+        IReminderService reminderService, ILogger<MessageHandler> logger)
     {
         _sendMessageHandler = sendMessageHandler;
+        _userService = userService;
         _reminderService = reminderService;
         _logger = logger;
-        _reminderSchedule = new()
-        {
-            [3] = "Любые изменения всегда начинаются с маленького с первого шага, с малого, но решительного выбора, в сторону лучшего себя.",
-            [15] = "Если вы ожидали знака, того самого момента, чтобы подняться над собой, обрести харизму, уверенность и силу слова, то это именно он, знак.",
-            [180] = "Сюда вставить видео кружочек"
-        };
     }
 
     public async Task HandleMessageAsync(ITelegramBotClient bot, Message message, CancellationToken cancellationToken)
@@ -39,10 +36,12 @@ public class MessageHandler : IMessageHandler
             return;
         }
 
-        switch (messageText.Split(' ')[0])
+        var command = GetCommandFromMessageText(message.Text);
+
+        switch (command)
         {
-            case "/start":
-                ScheduleReminders(message.Chat.Id, message.From.Id);
+            case BotCommand.Start:
+                await HandleScheduleReminders(message.Chat.Id, message.From.Id, message.From.Username, message.From.FirstName, message.From.LastName);
                 await SendWelcomeMessage(bot, message.Chat.Id);
                 break;
 
@@ -53,12 +52,17 @@ public class MessageHandler : IMessageHandler
 
     #region Private methods
 
-    private void ScheduleReminders(long chatId, long userId)
+    public BotCommand GetCommandFromMessageText(string messageText)
     {
-        foreach (var (delay, message) in _reminderSchedule)
-        {
-            _reminderService.ScheduleReminder(chatId, userId, message, JOIN_CLUB_CALLBACK, JOIN_CLUB_BUTTON, TimeSpan.FromMinutes(delay));
-        }
+        var commandText = messageText.Split(' ')[0];
+
+        return Enum.TryParse(commandText.TrimStart('/'), true, out BotCommand command) ? command : BotCommand.Unknown;
+    }
+
+    private async Task HandleScheduleReminders(long chatId, long userId, string? userName, string? firstName, string? lastName)
+    {
+        await _userService.AddUserAsync(userId, userName, firstName, lastName);
+        await _reminderService.HandleScheduleReminder(chatId, userId, JOIN_CLUB_CALLBACK, JOIN_CLUB_BUTTON, NotificationPhase.Welcome);
     }
 
     private async Task SendWelcomeMessage(ITelegramBotClient bot, long chatId)

@@ -14,7 +14,6 @@ public static class ApplicationHandlerExtension
             .AddScoped<IUnknownRequestHandler, UnknownRequestHandler>()
             .AddScoped<IMessageHandler, MessageHandler>()
             .AddScoped<IUpdateHandler, BotRequestHandler>()
-
-            .AddSingleton<ISendMessageHandler, SendMessageHandler>();
+            .AddScoped<ISendMessageHandler, SendMessageHandler>();
     }
 }

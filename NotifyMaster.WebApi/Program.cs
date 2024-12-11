@@ -11,9 +11,12 @@ builder.Services
     .AddTelegramBotClient()
     .ConfigureTelegramBotMvc()
     .AddControllers().Services
-    .AddHandlers()
+    .AddDatabase()
+    .AddDataProviders()
     .AddServices()
-    .AddHangfire();
+    .AddHandlers()
+    .AddHangfire()
+    .AddMapping();
 
 var app = builder.Build();
 

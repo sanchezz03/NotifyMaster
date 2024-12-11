@@ -55,15 +55,7 @@ public static class TypesHelper
 
     private static List<Assembly> GetAllAssembly()
     {
-        List<Assembly> allAssemblies = new List<Assembly>();
-        var location = Assembly.GetExecutingAssembly().Location;
-        string path = Path.GetDirectoryName(location);
-        foreach (string dll in Directory.GetFiles(path, "*.dll"))
-        {
-            allAssemblies.Add(Assembly.LoadFile(dll));
-        }
-
-        return allAssemblies;
+        return AppDomain.CurrentDomain.GetAssemblies().ToList();
     }
 
     private static bool IsSubclassOfRawGeneric(Type baseType, Type derivedType)

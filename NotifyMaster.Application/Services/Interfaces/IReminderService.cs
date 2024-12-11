@@ -1,7 +1,9 @@
-﻿namespace NotifyMaster.Application.Services.Interfaces;
+﻿using NotifyMaster.Common.Enums;
+
+namespace NotifyMaster.Application.Services.Interfaces;
 
 public interface IReminderService
 {
-    void ScheduleReminder(long chatId, long userId, string message, string callbackData, string button, TimeSpan delay);
-    void CancelReminders(long userId);
+    Task HandleScheduleReminder(long chatId, long userId, string callbackData, string button, NotificationPhase notificationPhase);
+    Task CancelReminders(long userId);
 }

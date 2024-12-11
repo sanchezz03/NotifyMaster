@@ -1,47 +1,93 @@
 ﻿using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using NotifyMaster.Application.DataProviders.Intefaces;
 using NotifyMaster.Application.Handlers.Interfaces;
 using NotifyMaster.Application.Services.Interfaces;
-using System.Collections.Concurrent;
+using NotifyMaster.Common.Enums;
 using Telegram.Bot;
 
 namespace NotifyMaster.Application.Services;
 
 public class ReminderService : IReminderService
 {
-    private readonly ConcurrentDictionary<long, List<string>> _userReminders;
+    private readonly IMessageReminderDataProvider _messageReminderDataProvider;
+    private readonly IUserReminderDataProvider _userReminderDataProvider;
     private readonly ISendMessageHandler _sendMessageHandler;
+    private readonly IUserService _userService;
     private readonly ITelegramBotClient _botClient;
     private readonly ILogger<ReminderService> _logger;
 
-    public ReminderService(ISendMessageHandler sendMessageHandler, ITelegramBotClient botClient, ILogger<ReminderService> logger)
+    public ReminderService(IMessageReminderDataProvider messageReminderDataProvider, IUserReminderDataProvider userReminderDataProvider,
+        ISendMessageHandler sendMessageHandler, IUserService userService, ITelegramBotClient botClient, ILogger<ReminderService> logger)
     {
+        _messageReminderDataProvider = messageReminderDataProvider;
+        _userReminderDataProvider = userReminderDataProvider;
         _sendMessageHandler = sendMessageHandler;
-        _userReminders = new();
+        _userService = userService;
         _botClient = botClient;
         _logger = logger;
     }
 
-    public void ScheduleReminder(long chatId, long userId, string message, string callbackData, string button, TimeSpan delay)
+    public async Task HandleScheduleReminder(long chatId, long userId, string callbackData, string button, NotificationPhase notificationPhase)
     {
-        var jobId = BackgroundJob.Schedule(() => SendReminderMessage(chatId, message, callbackData, button), delay);
+        var reminderMessageDto = await _messageReminderDataProvider.GetReminderMessageDtoAsync(notificationPhase);
 
-        if (!_userReminders.ContainsKey(userId))
-        {
-            _userReminders[userId] = new List<string>();
-        }
+        var jobId = BackgroundJob.Schedule<ReminderService>(x =>
+            x.HandleSendingReminderMessage(chatId, userId, callbackData, button, notificationPhase, null), TimeSpan.FromSeconds(20));
 
-        _userReminders[userId].Add(jobId);
+        BackgroundJob.ContinueWith(jobId, () =>
+             ScheduleNextJobs(chatId, userId, callbackData, button));
     }
 
-    public void CancelReminders(long userId)
+    public async Task CancelReminders(long userId)
     {
-        if (_userReminders.TryRemove(userId, out var jobIds))
+        var userReminderDtos = await _userReminderDataProvider.GetUserRemindersAsync(userId);
+
+        foreach (var dto in userReminderDtos)
         {
-            foreach (var jobId in jobIds)
-            {
-                BackgroundJob.Delete(jobId);
-            }
+            BackgroundJob.Delete(dto.JobId);
+        }
+
+        await _userReminderDataProvider.DeleteByUserId(userId);
+    }
+
+    public async Task HandleSendingReminderMessage(long chatId, long userId, string callbackData, string button, NotificationPhase notificationPhase, PerformContext context)
+    {
+        var reminderMessageDto = await _messageReminderDataProvider.GetReminderMessageDtoAsync(notificationPhase);
+
+        await SendReminderMessage(chatId, reminderMessageDto.Message, callbackData, button);
+
+        await _userReminderDataProvider.AddUserReminderAsync(userId, context.BackgroundJob.Id, DateTime.Now.Add(reminderMessageDto.Delay), reminderMessageDto.Id);
+    }
+
+    public async Task ScheduleNextJobs(long chatId, long userId, string callbackData, string button)
+    {
+        var notificationPhase = await _userService.CheckStatus(userId);
+
+        switch (notificationPhase)
+        {
+            case NotificationPhase.EarlyReminder:
+                BackgroundJob.Schedule(() =>
+                   HandleSendingReminderMessage(chatId, userId, callbackData, button, NotificationPhase.EarlyReminder, null),
+                   TimeSpan.FromSeconds(30));
+                break;
+
+            case NotificationPhase.LateReminder:
+                BackgroundJob.Schedule(() =>
+                    HandleSendingReminderMessage(chatId, userId, callbackData, button, NotificationPhase.LateReminder, null),
+                    TimeSpan.FromSeconds(30));
+                break;
+
+            case NotificationPhase.EventPromotion:
+                BackgroundJob.Schedule(() =>
+                    HandleSendingReminderMessage(chatId, userId, callbackData, button, NotificationPhase.EventPromotion, null),
+                    TimeSpan.FromSeconds(60));
+                break;
+
+            default:
+                _logger.LogInformation("No further jobs to schedule for user {UserId}", userId);
+                break;
         }
     }
 
@@ -57,3 +103,4 @@ public class ReminderService : IReminderService
         }
     }
 }
+
