@@ -1,4 +1,5 @@
 ﻿using NotifyMaster.Application.DataProviders.Intefaces;
+using NotifyMaster.Application.Dtos;
 using NotifyMaster.Application.Services.Interfaces;
 using NotifyMaster.Common.Enums;
 
@@ -18,24 +19,9 @@ public class UserService : IUserService
         await _userDataProvider.AddUserAsync(userId, userName, firstName, lastName, groupStatus); 
     }
 
-    public async Task<NotificationPhase> CheckStatus(long userId)
+    public async Task<UserDto> GetUserDtoAsync(long userId)
     {
-        var userDto = await _userDataProvider.GetUserDtoAsync(userId);
-
-        switch (userDto.GroupStatus)
-        {
-            case GroupStatus.Unregistered:
-                return NotificationPhase.EarlyReminder;
-
-            case GroupStatus.Member:
-                return NotificationPhase.LateReminder;
-
-            case GroupStatus.Pending:
-                return NotificationPhase.EventPromotion;
-
-            default:
-                return NotificationPhase.None;
-        }
+        return await _userDataProvider.GetUserDtoAsync(userId);
     }
 
     public async Task UpdateUserStatusAsync(long userId, GroupStatus newStatus)
@@ -49,6 +35,6 @@ public class UserService : IUserService
 
         userDto.GroupStatus = newStatus;
 
-        _userDataProvider.UpdateUser(userDto);
+        await _userDataProvider.UpdateUserAsync(userDto);
     }
 }

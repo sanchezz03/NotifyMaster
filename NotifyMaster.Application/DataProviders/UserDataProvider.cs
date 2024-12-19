@@ -20,10 +20,18 @@ public class UserDataProvider : IUserDataProvider
 
     public async Task AddUserAsync(long userId, string? userName, string? firstName, string? lastName, GroupStatus groupStatus = GroupStatus.Unregistered)
     {
+        var user = await _userRepository.GetByUserIdAsync(userId);  
+
+        if (user != null)
+        {
+            return;
+        }
+
         var userDto = GetUserDto(userId, userName, firstName, lastName, groupStatus);
-        var user = _mapper.Map<User>(userDto);
+        user = _mapper.Map<User>(userDto);
 
         await _userRepository.AddAsync(user);
+        await _userRepository.SaveChangesAsync();
     }
 
     public async Task<UserDto> GetUserDtoAsync(long userId)
@@ -33,10 +41,11 @@ public class UserDataProvider : IUserDataProvider
         return _mapper.Map<UserDto>(user);
     }
 
-    public void UpdateUser(UserDto userDto)
+    public async Task UpdateUserAsync(UserDto userDto)
     {
         var user = _mapper.Map<User>(userDto);
         _userRepository.Update(user);
+        await _userRepository.SaveChangesAsync();
     }
 
     #region Private methods

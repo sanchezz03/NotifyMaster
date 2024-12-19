@@ -10,11 +10,11 @@ public class MessageReminderRepository : BaseRelationalRepository<MessageReminde
     public MessageReminderRepository(NotifyMasterDbContext dbContext)
         : base(dbContext) { }
 
-    public async Task<MessageReminder> GetByNotificationPhaseAsync(NotificationPhase notificationPhase)
+    public async Task<List<MessageReminder>> GetListByNotificationPhaseAsync(NotificationPhase notificationPhase)
     {
         var specification = new MessageReminderByNotificationPhaseSpecification(notificationPhase);
         var entities = await FindBySpecificationAsync(specification);
-        var entity = entities.FirstOrDefault(e => e.NotificationPhase.Equals(notificationPhase));
-        return entity;
+
+        return entities.ToList();
     }
 }

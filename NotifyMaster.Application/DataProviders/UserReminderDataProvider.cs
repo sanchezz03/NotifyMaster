@@ -17,11 +17,12 @@ public class UserReminderDataProvider : IUserReminderDataProvider
         _mapper = mapper;
     }
 
-    public async Task AddUserReminderAsync(long userId, string jobId, DateTime scheduleTime, long reminderMessageId)
+    public async Task AddUserReminderAsync(long userId, string jobId)
     {
-        var userReminder = GetUserReminder(userId, jobId, scheduleTime, reminderMessageId);
+        var userReminder = GetUserReminder(userId, jobId);
 
         await _userReminderRepository.AddAsync(userReminder);
+        await _userReminderRepository.SaveChangesAsync();
     }
 
     public async Task<List<UserReminderDto>> GetUserRemindersAsync(long userId)
@@ -36,18 +37,17 @@ public class UserReminderDataProvider : IUserReminderDataProvider
         var userReminders = await _userReminderRepository.GetAllByUserIdAsync(userId);
 
         await _userReminderRepository.DeleteRangeAsync(userReminders);
+        await _userReminderRepository.SaveChangesAsync();
     }
 
     #region Private methods
 
-    private UserReminder GetUserReminder(long userId, string jobId, DateTime scheduleTime, long reminderMessageId)
+    private UserReminder GetUserReminder(long userId, string jobId)
     {
         var userReminderDto = new UserReminderDto()
         {
             UserId = userId,
             JobId = jobId,
-            ScheduledTime = scheduleTime,
-            MessageReminderId = reminderMessageId
         };
 
         return _mapper.Map<UserReminder>(userReminderDto);

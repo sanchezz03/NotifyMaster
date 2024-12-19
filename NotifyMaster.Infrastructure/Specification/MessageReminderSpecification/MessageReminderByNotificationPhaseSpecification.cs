@@ -8,6 +8,6 @@ public class MessageReminderByNotificationPhaseSpecification : BaseSpecification
     public MessageReminderByNotificationPhaseSpecification(NotificationPhase notificationPhase)
         : base(m => m.NotificationPhase.Equals(notificationPhase))
     {
-
+        AddInclude(m => m.Button);
     }
 }

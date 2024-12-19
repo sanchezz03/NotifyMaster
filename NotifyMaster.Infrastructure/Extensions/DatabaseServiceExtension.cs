@@ -30,7 +30,7 @@ public static class DatabaseServiceExtension
 
         services.AddDbContextPool<NotifyMasterDbContext>((services, options) =>
         {
-            options.UseSqlServer(configuration.Value.ConnectionString, b => 
+            options.UseNpgsql(configuration.Value.ConnectionString, b => 
                 b.MigrationsAssembly(Constants.MIGRATION_PROJECT_NAME));
         });
 

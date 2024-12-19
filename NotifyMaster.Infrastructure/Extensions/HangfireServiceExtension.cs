@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NotifyMaster.Common.ConfigurationModels;
@@ -21,7 +22,7 @@ public static class HangfireServiceExtension
             throw new Exception("Not found Hangfire configuration in config file");
         }
 
-        return services.AddHangfire(cfg => cfg.UseSqlServerStorage(configuration.Value.ConnectionString))
+        return services.AddHangfire(cfg => cfg.UsePostgreSqlStorage(configuration.Value.ConnectionString))
             .AddHangfireServer();
     }
 

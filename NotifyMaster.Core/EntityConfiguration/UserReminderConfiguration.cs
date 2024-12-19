@@ -21,15 +21,6 @@ public class UserReminderConfiguration : IEntityTypeConfiguration<UserReminder>
             .IsRequired();
 
         builder
-            .Property(r => r.ScheduledTime)
-            .IsRequired();
-
-        builder
-            .HasOne(r => r.ReminderMessage)
-            .WithMany()
-            .HasForeignKey(r => r.ReminderMessageId);
-
-        builder
             .HasOne(r => r.User)
             .WithMany(u => u.UserReminders)
             .HasForeignKey(r => r.UserId);
