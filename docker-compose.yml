@@ -1,6 +1,6 @@
 services:
   notifymaster.webapi:
-    image: notifymasterwebapi
+    image: sanchezz03/notifymaster:webapi
     container_name: notifymaster.webapi
     build:
       context: .
