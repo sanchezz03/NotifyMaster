@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NotifyMaster.Infrastructure.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NotifyMaster.Infrastructure.Migrations
 {
     [DbContext(typeof(NotifyMasterDbContext))]
-    partial class NotifyMasterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241215232920_Add_VideoUrl_Field")]
+    partial class Add_VideoUrl_Field
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,23 +25,6 @@ namespace NotifyMaster.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("NotifyMaster.Core.Entities.Button", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Buttons");
-                });
-
             modelBuilder.Entity("NotifyMaster.Core.Entities.MessageReminder", b =>
                 {
                     b.Property<long>("Id")
@@ -46,9 +32,6 @@ namespace NotifyMaster.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("ButtonId")
-                        .HasColumnType("bigint");
 
                     b.Property<TimeSpan>("Delay")
                         .HasColumnType("interval");
@@ -65,8 +48,6 @@ namespace NotifyMaster.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ButtonId");
 
                     b.ToTable("MessageReminders");
                 });
@@ -111,34 +92,39 @@ namespace NotifyMaster.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long>("ReminderMessageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ScheduledTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReminderMessageId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("UserReminders");
                 });
 
-            modelBuilder.Entity("NotifyMaster.Core.Entities.MessageReminder", b =>
+            modelBuilder.Entity("NotifyMaster.Core.Entities.UserReminder", b =>
                 {
-                    b.HasOne("NotifyMaster.Core.Entities.Button", "Button")
+                    b.HasOne("NotifyMaster.Core.Entities.MessageReminder", "ReminderMessage")
                         .WithMany()
-                        .HasForeignKey("ButtonId")
+                        .HasForeignKey("ReminderMessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Button");
-                });
-
-            modelBuilder.Entity("NotifyMaster.Core.Entities.UserReminder", b =>
-                {
                     b.HasOne("NotifyMaster.Core.Entities.User", "User")
                         .WithMany("UserReminders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ReminderMessage");
 
                     b.Navigation("User");
                 });

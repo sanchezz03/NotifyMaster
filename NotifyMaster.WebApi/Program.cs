@@ -20,6 +20,11 @@ builder.Services
 
 var app = builder.Build();
 
+if(app.Environment.IsDevelopment())
+{
+    app.ApplyMigrations();
+}
+
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

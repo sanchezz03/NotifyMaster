@@ -14,6 +14,7 @@ public class NotifyMasterDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<UserReminder> UserReminders { get; set; }
     public DbSet<MessageReminder> MessageReminders { get; set; }
+    public DbSet<Button> Buttons { get; set; }
 
     #endregion
 
@@ -28,7 +29,7 @@ public class NotifyMasterDbContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer(_connectionString);
+            optionsBuilder.UseNpgsql(_connectionString);
         }
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)

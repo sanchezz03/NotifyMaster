@@ -17,11 +17,20 @@ public class MessageReminderConfiguration : IEntityTypeConfiguration<MessageRemi
             .IsRequired();
 
         builder
+            .Property(r => r.VideoUrl)
+            .IsRequired(false);
+
+        builder
             .Property(r => r.Delay)
             .IsRequired();
 
         builder
             .Property(r => r.NotificationPhase)
             .IsRequired();
+
+        builder
+           .HasOne(r => r.Button)
+           .WithMany()
+           .HasForeignKey(r => r.ButtonId);
     }
 }

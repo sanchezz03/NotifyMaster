@@ -6,5 +6,6 @@ public enum NotificationPhase
     Welcome = 1,        
     EarlyReminder = 2,   
     LateReminder = 3,     
-    EventPromotion = 4 
+    EventPromotionReminder = 4,
+    EventPromotion = 5,
 }

@@ -1,4 +1,6 @@
-﻿using NotifyMaster.Application.Handlers.Interfaces;
+﻿using NotifyMaster.Application.DataProviders.Intefaces;
+using NotifyMaster.Application.Dtos;
+using NotifyMaster.Application.Handlers.Interfaces;
 using NotifyMaster.Application.Services.Interfaces;
 using NotifyMaster.Common.Enums;
 using Telegram.Bot;
@@ -12,17 +14,21 @@ public class CallbackQueryHandler : ICallbackQueryHandler
     private readonly IReminderService _reminderService;
     private readonly IUserService _userService;
 
-    private readonly TimeSpan TEN_MINUTES = TimeSpan.FromMinutes(1);
+    private readonly IMessageReminderDataProvider _messageReminderDataProvider;
+    private readonly IButtonDataProvider _buttonDataProvider;
 
     private const string JOIN_CLUB_CALLBACK = "join_club";
     private const string SING_UP_CALLBACK = "sing_up";
-    private const string SING_UP_BUTTON = "Записаться";
 
-    public CallbackQueryHandler(ISendMessageHandler sendMessageHandler, IReminderService reminderService, IUserService userService)
+    public CallbackQueryHandler(ISendMessageHandler sendMessageHandler, IReminderService reminderService, IUserService userService,
+        IMessageReminderDataProvider messageReminderDataProvider, IButtonDataProvider buttonDataProvider)
     {
         _sendMessageHandler = sendMessageHandler;
         _reminderService = reminderService;
         _userService = userService;
+
+        _messageReminderDataProvider = messageReminderDataProvider;
+        _buttonDataProvider = buttonDataProvider;
     }
 
     public async Task HandleCallbackQueryAsync(ITelegramBotClient bot, CallbackQuery callbackQuery, CancellationToken cancellationToken)
@@ -30,8 +36,9 @@ public class CallbackQueryHandler : ICallbackQueryHandler
         switch (callbackQuery.Data)
         {
             case JOIN_CLUB_CALLBACK:
-                await HandleSendingWelcomeMessageAsync(bot, callbackQuery.Message.Chat.Id, callbackQuery.From.Id);
-                await SendNextEventReminderAsync(bot, callbackQuery.Message.Chat.Id, callbackQuery.From.Id);
+                var reminderMessageDtos = await _messageReminderDataProvider.GetListReminderMessageDtoAsync(NotificationPhase.EventPromotion);
+                await HandleSendingWelcomeMessageAsync(bot, callbackQuery.Message.Chat.Id, callbackQuery.From.Id, reminderMessageDtos);
+                await SendNextEventReminderAsync(bot, callbackQuery.Message.Chat.Id, callbackQuery.From.Id, reminderMessageDtos);
                 break;
 
             case SING_UP_CALLBACK:
@@ -47,32 +54,27 @@ public class CallbackQueryHandler : ICallbackQueryHandler
 
     #region Private methods
 
-    private async Task HandleSendingWelcomeMessageAsync(ITelegramBotClient bot, long chatId, long userId)
+    private async Task HandleSendingWelcomeMessageAsync(ITelegramBotClient bot, long chatId, long userId, List<MessageReminderDto> messageReminderDtos)
     {
-        var message = "Добро пожаловать! Мы рады видеть вас среди тех, кто горит стремлением к лучшему. " +
-                      "Это полезное видео — ваш первый инструмент на пути к совершенствованию. " +
-                      "[Сюда вставить тему первого видео, переписать предложение, чтобы гармонично сочеталось с тематикой]";
+        var messageDto = messageReminderDtos.FirstOrDefault();
+        var buttonDto = await _buttonDataProvider.GetAsync(messageDto.ButtonId);
 
-        await _reminderService.CancelReminders(userId);
+        var userDto = await _userService.GetUserDtoAsync(userId);
+        await _reminderService.CancelReminders(userDto.Id);
+
         await _userService.UpdateUserStatusAsync(userId, GroupStatus.Member);
 
-        await _sendMessageHandler.SendMessage(bot, chatId, message);
+        await _sendMessageHandler.SendMessage(bot, chatId, messageDto.Message, null, null, buttonDto.Name);
     }
 
-    private async Task SendNextEventReminderAsync(ITelegramBotClient bot, long chatId, long userId)
+    private async Task SendNextEventReminderAsync(ITelegramBotClient bot, long chatId, long userId, List<MessageReminderDto> messageReminderDtos)
     {
-        var message = "Вы сделали важный шаг, и я поздравляю вас. " +
-                      "Но перемены требуют действий, шаг за шагом. " +
-                      "Наше следующее мероприятие — это ваш шанс учиться, расти и становиться более уверенным. " +
-                      "Стоимость участия $15. Запишитесь прямо сейчас и получите скидку 50% на первое занятие.";
+        var messageDto = messageReminderDtos.LastOrDefault();
+        var buttonDto = await _buttonDataProvider.GetAsync(messageDto.ButtonId);
 
-        var reminerMessage = "Напоминаем вам, что наше занятие уже близко. " +
-            "Запишитесь сейчас и начни свой путь обретению уверенности и харизмы." +
-            "Стоимость участия $15. На первое занятие скидка 50%.";
+        await _sendMessageHandler.SendMessage(bot, chatId, messageDto.Message, messageDto.VideoUrl, SING_UP_CALLBACK, buttonDto.Name);
 
-        await _reminderService.HandleScheduleReminder(chatId, userId, SING_UP_CALLBACK, SING_UP_BUTTON, NotificationPhase.EventPromotion);
-
-        await _sendMessageHandler.SendMessage(bot, chatId, message, SING_UP_CALLBACK, SING_UP_BUTTON);
+        await _reminderService.HandleScheduleReminder(chatId, userId, SING_UP_CALLBACK, buttonDto.Name, NotificationPhase.EventPromotionReminder);
     }
 
     #endregion
