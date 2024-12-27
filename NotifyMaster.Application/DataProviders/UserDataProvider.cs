@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using NotifyMaster.Application.DataProviders.Intefaces;
-using NotifyMaster.Application.Dtos;
+using NotifyMaster.Common.Dtos;
 using NotifyMaster.Common.Enums;
 using NotifyMaster.Core.Entities;
 using NotifyMaster.Infrastructure.Repositories;
@@ -32,6 +32,13 @@ public class UserDataProvider : IUserDataProvider
 
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
+    }
+
+    public async Task<List<UserDto>> GetUserDtosAsync()
+    {
+        var users = await _userRepository.GetAllAsync();
+
+        return _mapper.Map<List<UserDto>>(users);   
     }
 
     public async Task<UserDto> GetUserDtoAsync(long userId)

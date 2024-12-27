@@ -8,6 +8,7 @@ public static class Constants
     public const string CONFIGURATION_SECTION_TOKEN = "TelegramBot";
     public const string CONFIGURATION_SECTION_HANFIRE = "Hangfire";
     public const string CONFIGURATION_SECTION_DATABASE = "Database";
+    public const string CONFIGURATION_SECTION_SERVER_CONNECTION = "ServerConnection";
 
     /// <summary>
     /// DATABASE

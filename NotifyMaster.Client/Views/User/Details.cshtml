@@ -1,0 +1,31 @@
+﻿@using NotifyMaster.Client.Models.UserVM
+@model UserDetailViewModel
+
+<h2 class="mt-4 mb-3 text-center text-primary">User Details</h2>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row mb-2">
+            <div class="col-sm-4"><strong>User Id:</strong></div>
+            <div class="col-sm-8">@Model.UserId</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-4"><strong>User Name:</strong></div>
+            <div class="col-sm-8">@(Model.UserName ?? "Not specified")</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-4"><strong>First Name:</strong></div>
+            <div class="col-sm-8">@(Model.FirstName ?? "Not specified")</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-4"><strong>Last Name:</strong></div>
+            <div class="col-sm-8">@(Model.LastName ?? "Not specified")</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-4"><strong>Group Status:</strong></div>
+            <div class="col-sm-8">@Model.GroupStatus</div>
+        </div>
+    </div>
+</div>
+
+<a asp-controller="User" asp-action="Index" class="btn btn-secondary">Back to List</a>

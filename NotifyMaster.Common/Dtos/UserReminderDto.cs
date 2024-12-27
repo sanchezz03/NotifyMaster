@@ -1,4 +1,4 @@
-﻿namespace NotifyMaster.Application.Dtos;
+﻿namespace NotifyMaster.Common.Dtos;
 
 public class UserReminderDto
 {

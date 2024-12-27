@@ -1,0 +1,29 @@
+﻿@using NotifyMaster.Client.Models.ButtonVM
+@model List<ButtonViewModel>
+
+<h2 class="mt-4 mb-3 text-center text-primary">Buttons</h2>
+
+<table class="table table-hover table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Button Id</th>
+            <th>Button Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var button in Model)
+        {
+            <tr>
+                <td>@button.Id</td>
+                <td>@button.Name</td>
+                <td>
+                    <form asp-controller="Button" asp-action="Edit" method="get">
+                        <input type="hidden" name="id" value="@button.Id" />
+                        <button type="submit" class="btn btn-primary btn-sm">Edit</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

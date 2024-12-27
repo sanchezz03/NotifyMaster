@@ -2,7 +2,7 @@
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using NotifyMaster.Application.DataProviders.Intefaces;
-using NotifyMaster.Application.Dtos;
+using NotifyMaster.Common.Dtos;
 using NotifyMaster.Application.Handlers.Interfaces;
 using NotifyMaster.Application.Services.Interfaces;
 using NotifyMaster.Common.Enums;

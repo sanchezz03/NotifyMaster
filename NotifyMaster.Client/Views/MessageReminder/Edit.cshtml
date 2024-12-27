@@ -1,0 +1,53 @@
+﻿@using NotifyMaster.Client.Models.MessageReminderVM
+@model MessageReminderViewModel
+
+<h2 class="mt-4 mb-3 text-center text-primary">Edit Message Reminder</h2>
+
+<form asp-action="Edit" method="post">
+    <div class="form-group">
+        <label asp-for="Id" class="form-label" for="Id"></label>
+        <input asp-for="Id" class="form-control" id="Id" readonly />
+        <span asp-validation-for="Id" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Message" class="form-label" for="Message"></label>
+        <input asp-for="Message" class="form-control" id="Message" />
+        <span asp-validation-for="Message" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="VideoUrl" class="form-label" for="VideoUrl"></label>
+        <input asp-for="VideoUrl" class="form-control" id="VideoUrl" />
+        <span asp-validation-for="VideoUrl" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Delay" class="form-label" for="Delay"></label>
+        <input asp-for="Delay" class="form-control" id="Delay" />
+        <span asp-validation-for="Delay" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="NotificationPhase" class="form-label" for="NotificationPhase"></label>
+        <input asp-for="NotificationPhase" class="form-control" id="NotificationPhase" />
+        <span asp-validation-for="NotificationPhase" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelector("form").addEventListener("submit", function () {
+            const videoUrlInput = document.getElementById("VideoUrl");
+            if (!videoUrlInput.value) {
+                videoUrlInput.value = ""; 
+            }
+        });
+    </script>
+}

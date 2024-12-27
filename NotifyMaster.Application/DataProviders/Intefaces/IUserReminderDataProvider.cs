@@ -1,4 +1,4 @@
-﻿using NotifyMaster.Application.Dtos;
+﻿using NotifyMaster.Common.Dtos;
 
 namespace NotifyMaster.Application.DataProviders.Intefaces;
 
