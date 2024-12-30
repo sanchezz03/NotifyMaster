@@ -1,4 +1,5 @@
 using NotifyMaster.Client.Extensions;
+using NotifyMaster.Client.Middleware;
 using NotifyMaster.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,13 +10,17 @@ builder.Host
 builder.Services
     .AddControllersWithViews().Services
     .AddMapping()
-    .AddClient();
+    .AddFlurlClient();
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
+}
+else
+{
+    app.UseMiddleware<GlobalExceptionHandler>();
 }
 
 app.UseHttpsRedirection();

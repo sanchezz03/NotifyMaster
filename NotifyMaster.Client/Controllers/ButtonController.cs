@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
+using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using NotifyMaster.Client.Models.ButtonVM;
 using NotifyMaster.Common.Dtos;
-using System.Text;
 
 namespace NotifyMaster.Client.Controllers;
 
@@ -13,74 +12,41 @@ public class ButtonController : BaseController
 
     private readonly string _baseUrl = "api/button";
 
-    public ButtonController(HttpClient httpClient, IMapper mapper, ILogger<ButtonController> logger) 
-        : base(httpClient, mapper)
+    public ButtonController(IFlurlClient flurlClient, IMapper mapper, ILogger<ButtonController> logger) 
+        : base(flurlClient, mapper)
     {
         _logger = logger;
     }
 
     public async Task<IActionResult> Index()
     {
-        try
-        {
-            var response = await _httpClient.GetAsync(_baseUrl);
+        var buttonDtos = await _flurlClient.Request(_baseUrl).GetJsonAsync<List<ButtonDto>>();
+        var buttonVMs = _mapper.Map<List<ButtonViewModel>>(buttonDtos);
 
-            var buttonDtos = await ExecuteActionResultAsync<List<ButtonDto>>(response);
-            var buttonVMs = _mapper.Map<List<ButtonViewModel>>(buttonDtos);
-
-            return View(buttonVMs);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return BadRequest(ex.Message);
-        }
+        return View(buttonVMs);
     }
 
     public async Task<IActionResult> Edit(long id)
     {
-        try
-        {
-            var response = await _httpClient.GetAsync($"{_baseUrl}/{id}");
-            
-            var buttonDto = await ExecuteActionResultAsync<ButtonDto>(response);
-            var buttonVM = _mapper.Map<ButtonViewModel>(buttonDto);
+        var buttonDto = await _flurlClient.Request(_baseUrl, id).GetJsonAsync<ButtonDto>();
+        var buttonVM = _mapper.Map<ButtonViewModel>(buttonDto);
 
-            return View(buttonVM);
-        }
-        catch(Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return BadRequest(ex.Message);
-        }
+        return View(buttonVM);
     }
 
     [HttpPost]
     public async Task<IActionResult> Edit(ButtonViewModel buttonVM)
     {
-        try
+        var buttonDto = _mapper.Map<ButtonDto>(buttonVM);
+
+        var response = await _flurlClient.Request($"{_baseUrl}/edit")
+                                         .PutJsonAsync(buttonDto);
+
+        if (response.StatusCode == 200)
         {
-            var buttonDto = _mapper.Map<ButtonDto>(buttonVM);
-
-            var content = new StringContent(
-                JsonConvert.SerializeObject(buttonDto),
-                Encoding.UTF8,
-                "application/json"
-            );
-
-            var response = await _httpClient.PutAsync($"{_baseUrl}/edit", content);
-
-            if (response.IsSuccessStatusCode)
-            {
-                return RedirectToAction("Index");
-            }
-
-            return BadRequest();
+            return RedirectToAction("Index");
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return BadRequest(ex.Message);
-        }
+
+        return BadRequest();
     }
 }

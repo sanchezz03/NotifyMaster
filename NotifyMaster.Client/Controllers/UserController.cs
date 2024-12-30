@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
 using NotifyMaster.Client.Models.UserVM;
 using NotifyMaster.Common.Dtos;
@@ -11,35 +12,23 @@ public class UserController : BaseController
 
     private readonly string _baseUrl = "api/user";
 
-    public UserController(HttpClient httpClient, IMapper mapper, ILogger<UserController> logger)
-        : base(httpClient, mapper)
+    public UserController(IFlurlClient flurlClient, IMapper mapper, ILogger<UserController> logger)
+          : base(flurlClient, mapper)
     {
         _logger = logger;
     }
 
     public async Task<IActionResult> Index()
     {
-        try
-        {
-            var response = await _httpClient.GetAsync(_baseUrl);
+        var userDtos = await _flurlClient.Request(_baseUrl).GetJsonAsync<List<UserDto>>();
+        var userVMs = _mapper.Map<List<UserViewModel>>(userDtos);
 
-            var userDtos = await ExecuteActionResultAsync<List<UserDto>>(response);
-            var userVMs = _mapper.Map<List<UserViewModel>>(userDtos);
-
-            return View(userVMs);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return BadRequest(ex.Message);
-        }
+        return View(userVMs);
     }
 
     public async Task<IActionResult> Details(long userId)
     {
-        var response = await _httpClient.GetAsync($"{_baseUrl}/{userId}");
-        
-        var userDto = await ExecuteActionResultAsync<UserDto>(response);
+        var userDto = await _flurlClient.Request(_baseUrl, userId).GetJsonAsync<UserDto>();
 
         if (userDto == null)
         {

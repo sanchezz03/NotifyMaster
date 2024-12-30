@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using NotifyMaster.Client.Models.MessageReminderVM;
@@ -13,79 +14,51 @@ public class MessageReminderController : BaseController
 
     private readonly string _baseUrl = "api/messagereminder";
 
-    public MessageReminderController(HttpClient httpClient, IMapper mapper, ILogger<MessageReminderController> logger) 
-        : base(httpClient, mapper)
+    public MessageReminderController(IFlurlClient flurlClient, IMapper mapper, ILogger<MessageReminderController> logger)
+           : base(flurlClient, mapper)
     {
         _logger = logger;
     }
 
     public async Task<IActionResult> Index()
     {
-        try
-        {
-            var response = await _httpClient.GetAsync(_baseUrl);
+        var dtos = await _flurlClient.Request(_baseUrl).GetJsonAsync<List<MessageReminderDto>>();
+        var vms = _mapper.Map<List<MessageReminderViewModel>>(dtos);
 
-            var dtos = await ExecuteActionResultAsync<List<MessageReminderDto>>(response);
-            var vms = _mapper.Map<List<MessageReminderViewModel>>(dtos);
-
-            return View(vms);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return BadRequest(ex.Message);
-        }
+        return View(vms);
     }
 
     public async Task<IActionResult> Edit(long id)
     {
-        try
-        {
-            var response = await _httpClient.GetAsync($"{_baseUrl}/{id}");
+        var dto = await _flurlClient.Request(_baseUrl, id).GetJsonAsync<MessageReminderDto>();
+        var vm = _mapper.Map<MessageReminderViewModel>(dto);
 
-            var dto = await ExecuteActionResultAsync<MessageReminderDto>(response);
-            var vm = _mapper.Map<MessageReminderViewModel>(dto);
-
-            return View(vm);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return BadRequest(ex.Message);
-        }
+        return View(vm);
     }
 
     [HttpPost]
     public async Task<IActionResult> Edit(MessageReminderViewModel vm)
     {
-        try
+        if (string.IsNullOrEmpty(vm.VideoUrl))
         {
-            if (string.IsNullOrEmpty(vm.VideoUrl))
-            {
-                vm.VideoUrl = "";
-            }
-
-            var dto = _mapper.Map<MessageReminderDto>(vm);
-
-            var content = new StringContent(
-                JsonConvert.SerializeObject(dto),
-                Encoding.UTF8,
-                "application/json"
-            );
-
-            var response = await _httpClient.PutAsync($"{_baseUrl}/edit", content);
-
-            if (response.IsSuccessStatusCode)
-            {
-                return RedirectToAction("Index");
-            }
-
-            return BadRequest();
+            vm.VideoUrl = "";
         }
-        catch (Exception ex)
+
+        var dto = _mapper.Map<MessageReminderDto>(vm);
+
+        var content = new StringContent(
+            JsonConvert.SerializeObject(dto),
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        var response = await _flurlClient.Request($"{_baseUrl}/edit").PutJsonAsync(dto);
+
+        if (response.StatusCode == 200)
         {
-            _logger.LogError(ex.Message);
-            return BadRequest(ex.Message);
+            return RedirectToAction("Index");
         }
+
+        return BadRequest();
     }
 }
