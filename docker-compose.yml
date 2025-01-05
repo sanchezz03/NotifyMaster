@@ -41,8 +41,8 @@ services:
       context: .
       dockerfile: NotifyMaster.Client/Dockerfile
     ports:
-      - "7025:80"  
-      - "7024:80"
+      - "7025:4000"  
+      - "7024:4000"
     depends_on:
       - notifymaster.webapi
 

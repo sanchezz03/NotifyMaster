@@ -23,9 +23,10 @@ else
     app.UseMiddleware<GlobalExceptionHandler>();
 }
 
+app.UseStaticFiles();
+
 app.UseHttpsRedirection();
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -34,6 +35,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=User}/{action=Index}")
     .WithStaticAssets();
-
 
 app.Run();

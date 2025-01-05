@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER $APP_UID
 WORKDIR /app
-ENV DOTNET_URLS=http://+:5000
+ENV DOTNET_URLS=http://+:4000
 
 
 # This stage is used to build the service project
