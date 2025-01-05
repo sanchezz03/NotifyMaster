@@ -33,5 +33,18 @@ services:
        - "5050:80"
     depends_on:        
        - notifymaster.database
+
+  notifymaster.mvc:
+    image: notifymasterclient
+    container_name: notifymaster.client
+    build:
+      context: .
+      dockerfile: NotifyMaster.Client/Dockerfile
+    ports:
+      - "7025:4000"  
+      - "7024:4000"
+    depends_on:
+      - notifymaster.webapi
+
 volumes:  
     postgres-data:

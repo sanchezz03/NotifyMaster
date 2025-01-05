@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using NotifyMaster.Application.DataProviders.Intefaces;
-using NotifyMaster.Application.Dtos;
+using NotifyMaster.Common.Dtos;
 using NotifyMaster.Core.Entities;
 using NotifyMaster.Infrastructure.Repositories;
 

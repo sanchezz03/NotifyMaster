@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="13.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\NotifyMaster.Common\NotifyMaster.Common.csproj" />
     <ProjectReference Include="..\NotifyMaster.Core\NotifyMaster.Core.csproj" />
     <ProjectReference Include="..\NotifyMaster.Infrastructure\NotifyMaster.Infrastructure.csproj" />

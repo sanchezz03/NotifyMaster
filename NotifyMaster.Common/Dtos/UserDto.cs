@@ -1,6 +1,6 @@
 ﻿using NotifyMaster.Common.Enums;
 
-namespace NotifyMaster.Application.Dtos;
+namespace NotifyMaster.Common.Dtos;
 
 public class UserDto
 {

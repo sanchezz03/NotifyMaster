@@ -1,5 +1,5 @@
 ﻿using NotifyMaster.Application.DataProviders.Intefaces;
-using NotifyMaster.Application.Dtos;
+using NotifyMaster.Common.Dtos;
 using NotifyMaster.Application.Services.Interfaces;
 using NotifyMaster.Common.Enums;
 
@@ -17,6 +17,11 @@ public class UserService : IUserService
     public async Task AddUserAsync(long userId, string? userName, string? firstName, string? lastName, GroupStatus groupStatus = GroupStatus.Unregistered)
     {
         await _userDataProvider.AddUserAsync(userId, userName, firstName, lastName, groupStatus); 
+    }
+
+    public async Task<List<UserDto>> GetUserDtosAsync()
+    {
+       return await _userDataProvider.GetUserDtosAsync();
     }
 
     public async Task<UserDto> GetUserDtoAsync(long userId)

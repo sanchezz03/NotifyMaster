@@ -7,6 +7,7 @@ services:
       - TELEGRAM_BOT_TOKEN=7825825837:AAH8Q3DmW7yf9rJWzqJo08ndX619Z25tM9I
       - HANGFIRE_CONNECTION_STRING=Host=notifymaster.database;Port=5432;Database=HangfireDb;Username=root;Password=root
       - DATABASE_CONNECTION_STRING=Host=notifymaster.database;Port=5432;Database=NotifyMasterDb;Username=root;Password=root
+      - SERVER_CONNECTION_BASE_ADDRESS=http://notifymaster.webapi:8000/
     ports:
       - "8000:5000"
       - "8001:5000"

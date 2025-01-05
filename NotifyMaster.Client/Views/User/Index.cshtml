@@ -1,0 +1,31 @@
+﻿@using NotifyMaster.Client.Models.UserVM
+@model List<UserViewModel>
+
+<h2 class="mt-4 mb-3 text-center text-primary">Users</h2>
+
+<table class="table table-hover table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>UserId</th>
+            <th>UserName</th>
+            <th>GroupStatus</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.UserId</td>
+                <td>@user.UserName</td>
+                <td>@user.GroupStatus</td>
+                <td>
+                    <form asp-controller="User" asp-action="Details" method="get">
+                        <input type="hidden" name="userId" value="@user.UserId" />
+                        <button type="submit" class="btn btn-primary btn-sm">Detail</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

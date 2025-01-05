@@ -1,6 +1,7 @@
 using NotifyMaster.Application.Extensions;
 using NotifyMaster.Common.Extensions;
 using NotifyMaster.Infrastructure.Extensions;
+using NotifyMaster.WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,8 @@ builder.Services
     .AddServices()
     .AddHandlers()
     .AddHangfire()
-    .AddMapping();
+    .AddMapping()
+    .AddCORS();
 
 var app = builder.Build();
 

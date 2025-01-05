@@ -3,7 +3,7 @@ using NotifyMaster.Common.Helpers;
 using System.Reflection;
 using AutoMapper;
 
-namespace NotifyMaster.Application.Extensions;
+namespace NotifyMaster.Common.Extensions;
 
 public static class MappingExtension
 {
