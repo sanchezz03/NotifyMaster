@@ -82,6 +82,8 @@ To run the application, you can use one of the following methods:
 
 Follow these steps to run the application and set up the bot integration:
 
+## Build Docker Compose File
+
 ### Step 1: Build and Start Containers
 
   - Open a terminal in the project root where the docker-compose.yml file is located.
@@ -92,6 +94,22 @@ Follow these steps to run the application and set up the bot integration:
 
 ### Step 2: Verify the Application
    - After the containers are running, the application should be accessible at: http://notifymaster.client:4000/
+
+### Step 3: If you have trouble with database:
+  - Go to this url : http://localhost:5050/login?next=/
+  - Enter follow data:
+````
+username: admin@email.com
+password: root
+````
+ - Register server:
+````
+Name: pg_db
+Host name/address: 172.18.0.2(it should be took from notifymaster.database -> inspect -> IpAddress)
+Username: root
+Password: root
+````
+  - Create HangfireDb database and launch docker compose again
 
 ## 2. Install and Set Up ngrok
 
