@@ -6,18 +6,7 @@ Follow these steps to run the application and set up the bot integration:
 
 The project already includes docker-compose.yml and Dockerfile. Follow these steps to launch the application:
 
-### Step 1: Build and Start Containers
-
-  - Open a terminal in the project root where the docker-compose.yml file is located.
-  - Run the following command:
-  ````bash
-  docker-compose up --build
-````
-
-### Step 2: Verify the Application
-   - After the containers are running, the application should be accessible at: http://notifymaster.client:4000/
-
-## 2. Install and Set Up ngrok
+## 1. Install and Set Up ngrok
 
 To expose your local server to the internet, you need to use ngrok.
 
@@ -47,14 +36,14 @@ To expose your local server to the internet, you need to use ngrok.
 ### Step 5: Update the Webhook URL in Telegram
 After setting up ngrok, you need to update the webhook URL for the Telegram bot.
 
-## 3. Modify the Webhook URL
+## 2. Modify the Webhook URL
 - In the terminal, you should have the **forwarding URL** from ngrok (e.g., `https://2ae1-146-120-162-35.ngrok-free.app`).
 - Replace `{forwarding_url}` in the following link with the ngrok URL you copied:
 
   ```plaintext
   https://api.telegram.org/bot7825825837:AAH8Q3DmW7yf9rJWzqJo08ndX619Z25tM9I/setWebhook?url={forwarding_url}/api/bot
   
-## 4. Update the Connection String to SQL Server
+## 3. Update the Connection String to SQL Server
 
 To connect your application to your own SQL Server database, follow these steps:
 
@@ -69,7 +58,7 @@ To connect your application to your own SQL Server database, follow these steps:
   builder.Services.AddDbContext<ApplicationDbContext>(options =>
       options.UseSqlServer("Your_Connection_String_Here"));
   
-## 5. Launch the Application
+## 4. Launch the Application
 
 To run the application, you can use one of the following methods:
 
@@ -93,7 +82,18 @@ To run the application, you can use one of the following methods:
 
 Follow these steps to run the application and set up the bot integration:
 
-## 6. Install and Set Up ngrok
+### Step 1: Build and Start Containers
+
+  - Open a terminal in the project root where the docker-compose.yml file is located.
+  - Run the following command:
+  ````bash
+  docker-compose up --build
+````
+
+### Step 2: Verify the Application
+   - After the containers are running, the application should be accessible at: http://notifymaster.client:4000/
+
+## 2. Install and Set Up ngrok
 
 To expose your local server to the internet, you need to use ngrok.
 
