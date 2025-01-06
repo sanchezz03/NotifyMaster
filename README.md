@@ -2,10 +2,6 @@
 
 Follow these steps to run the application and set up the bot integration:
 
-## 1. Launch the Application using Docker Compose
-
-The project already includes docker-compose.yml and Dockerfile. Follow these steps to launch the application:
-
 ## 1. Install and Set Up ngrok
 
 To expose your local server to the internet, you need to use ngrok.
@@ -82,7 +78,9 @@ To run the application, you can use one of the following methods:
 
 Follow these steps to run the application and set up the bot integration:
 
-## Build Docker Compose File
+## 1. Launch the Application using Docker Compose
+
+The project already includes docker-compose.yml and Dockerfile. Follow these steps to launch the application:
 
 ### Step 1: Build and Start Containers
 
