@@ -103,7 +103,7 @@ password: root
  - Register server:
 ````
 Name: pg_db
-Host name/address: 172.18.0.2(it should be took from notifymaster.database -> inspect -> IpAddress)
+Host name/address: 172.18.0.2(it should be retrieved from `notifymaster.database` -> Inspect -> `IPAddress`)
 Username: root
 Password: root
 ````
