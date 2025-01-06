@@ -108,6 +108,7 @@ To expose your local server to the internet, you need to use ngrok.
 ### Step 3: Retrieve the Application URL 
   ```json
   "BaseAddress": "http://notifymaster.webapi:5000/"
+```
 
 ### Step 4: Run ngrok
 
