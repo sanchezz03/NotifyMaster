@@ -134,4 +134,14 @@ To expose your local server to the internet, you need to use ngrok.
   ngrok http http://notifymaster.webapi:5000/
 - Copy the forwarding URL shown in the terminal (e.g., https://2ae1-146-120-162-35.ngrok-free.app).
 
+### Step 5: Update the Webhook URL in Telegram
+After setting up ngrok, you need to update the webhook URL for the Telegram bot.
+
+## 2. Modify the Webhook URL
+- In the terminal, you should have the **forwarding URL** from ngrok (e.g., `https://2ae1-146-120-162-35.ngrok-free.app`).
+- Replace `{forwarding_url}` in the following link with the ngrok URL you copied:
+
+  ```plaintext
+  https://api.telegram.org/bot7825825837:AAH8Q3DmW7yf9rJWzqJo08ndX619Z25tM9I/setWebhook?url={forwarding_url}/api/bot
+  
 
