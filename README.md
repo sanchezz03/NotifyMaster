@@ -10,8 +10,8 @@ The project already includes docker-compose.yml and Dockerfile. Follow these ste
 
   - Open a terminal in the project root where the docker-compose.yml file is located.
   - Run the following command:
-  ````bash
-  docker-compose up --build````
+  ````bash````
+  docker-compose up --build
 
 ### Step 2: Verify the Application
    - After the containers are running, the application should be accessible at: http://notifymaster.client:4000/
